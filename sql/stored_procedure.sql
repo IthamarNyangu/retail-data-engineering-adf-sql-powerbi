@@ -15,20 +15,24 @@ END;
 GO
 
 -- 2) Truncate final (so final tables don’t duplicate on reload)
+USE RetailDB;
+GO
+
 CREATE OR ALTER PROCEDURE sp_TruncateFinal
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Fact first (because it depends on dimensions)
-    TRUNCATE TABLE Sales;
+    -- Delete fact rows first (child table)
+    DELETE FROM Sales;
 
-    -- Then dimensions
-    TRUNCATE TABLE Salespersons;
-    TRUNCATE TABLE Products;
-    TRUNCATE TABLE Stores;
+    -- Then delete dimension rows (parents)
+    DELETE FROM Salespersons;
+    DELETE FROM Products;
+    DELETE FROM Stores;
 END;
 GO
+
 
 -- 3) Load dimensions first
 CREATE OR ALTER PROCEDURE sp_LoadStores
@@ -78,6 +82,9 @@ END;
 GO
 
 -- 4) Load fact last (FK-safe)
+USE RetailDB;
+GO
+
 CREATE OR ALTER PROCEDURE sp_LoadSales
 AS
 BEGIN
@@ -103,3 +110,4 @@ BEGIN
     WHERE s.SalesID IS NOT NULL;
 END;
 GO
+
