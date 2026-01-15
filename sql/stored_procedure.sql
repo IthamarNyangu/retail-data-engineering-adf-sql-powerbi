@@ -1,6 +1,7 @@
 USE RetailDB;
 GO
 
+-- 1) Truncate staging (safe to rerun pipeline without duplicates)
 CREATE OR ALTER PROCEDURE sp_TruncateStaging
 AS
 BEGIN
@@ -13,12 +14,13 @@ BEGIN
 END;
 GO
 
+-- 2) Truncate final (so final tables don’t duplicate on reload)
 CREATE OR ALTER PROCEDURE sp_TruncateFinal
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Fact table first (because it references dimensions)
+    -- Fact first (because it depends on dimensions)
     TRUNCATE TABLE Sales;
 
     -- Then dimensions
@@ -28,6 +30,7 @@ BEGIN
 END;
 GO
 
+-- 3) Load dimensions first
 CREATE OR ALTER PROCEDURE sp_LoadStores
 AS
 BEGIN
@@ -74,6 +77,7 @@ BEGIN
 END;
 GO
 
+-- 4) Load fact last (FK-safe)
 CREATE OR ALTER PROCEDURE sp_LoadSales
 AS
 BEGIN
@@ -93,8 +97,8 @@ BEGIN
         s.Revenue,
         s.Cost
     FROM stg_Sales s
-    INNER JOIN Stores st ON st.StoreID = s.StoreID
-    INNER JOIN Products p ON p.ProductID = s.ProductID
+    INNER JOIN Stores st       ON st.StoreID = s.StoreID
+    INNER JOIN Products p      ON p.ProductID = s.ProductID
     INNER JOIN Salespersons sp ON sp.SalesPersonID = s.SalesPersonID
     WHERE s.SalesID IS NOT NULL;
 END;
