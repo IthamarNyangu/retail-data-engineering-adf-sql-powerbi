@@ -13,21 +13,22 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE sp_LoadSalespersons
+CREATE OR ALTER PROCEDURE sp_TruncateFinal
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Salespersons (SalesPersonID, SalesPersonName, StoreID)
-    SELECT DISTINCT
-        SalesPersonID,
-        SalesPersonName,
-        StoreID
-    FROM stg_Salespersons
-    WHERE SalesPersonID IS NOT NULL;
-END;
+    -- Fact table first (because it references dimensions)
+    TRUNCATE TABLE Sales;
 
-CREATE PROCEDURE sp_LoadStores
+    -- Then dimensions
+    TRUNCATE TABLE Salespersons;
+    TRUNCATE TABLE Products;
+    TRUNCATE TABLE Stores;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE sp_LoadStores
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -40,8 +41,9 @@ BEGIN
     FROM stg_Stores
     WHERE StoreID IS NOT NULL;
 END;
+GO
 
-CREATE PROCEDURE sp_LoadProducts
+CREATE OR ALTER PROCEDURE sp_LoadProducts
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -55,8 +57,24 @@ BEGIN
     FROM stg_Products
     WHERE ProductID IS NOT NULL;
 END;
+GO
 
-CREATE PROCEDURE sp_LoadSales
+CREATE OR ALTER PROCEDURE sp_LoadSalespersons
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO Salespersons (SalesPersonID, SalesPersonName, StoreID)
+    SELECT DISTINCT
+        SalesPersonID,
+        SalesPersonName,
+        StoreID
+    FROM stg_Salespersons
+    WHERE SalesPersonID IS NOT NULL;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE sp_LoadSales
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -66,8 +84,18 @@ BEGIN
         UnitsSold, Revenue, Cost
     )
     SELECT
-        SalesID, SaleDate, StoreID, ProductID, SalesPersonID,
-        UnitsSold, Revenue, Cost
-    FROM stg_Sales
-    WHERE SalesID IS NOT NULL;
+        s.SalesID,
+        s.SaleDate,
+        s.StoreID,
+        s.ProductID,
+        s.SalesPersonID,
+        s.UnitsSold,
+        s.Revenue,
+        s.Cost
+    FROM stg_Sales s
+    INNER JOIN Stores st ON st.StoreID = s.StoreID
+    INNER JOIN Products p ON p.ProductID = s.ProductID
+    INNER JOIN Salespersons sp ON sp.SalesPersonID = s.SalesPersonID
+    WHERE s.SalesID IS NOT NULL;
 END;
+GO
