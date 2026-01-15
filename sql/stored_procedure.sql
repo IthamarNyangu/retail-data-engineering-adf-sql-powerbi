@@ -1,3 +1,18 @@
+USE RetailDB;
+GO
+
+CREATE OR ALTER PROCEDURE sp_TruncateStaging
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    TRUNCATE TABLE stg_Sales;
+    TRUNCATE TABLE stg_Salespersons;
+    TRUNCATE TABLE stg_Stores;
+    TRUNCATE TABLE stg_Products;
+END;
+GO
+
 CREATE PROCEDURE sp_LoadSalespersons
 AS
 BEGIN
