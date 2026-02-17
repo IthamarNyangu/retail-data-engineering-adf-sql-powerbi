@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Power BI caches/backups
+*.pbix~
+*.pbit
+**/.pbi/
+**/.pbicache/
+
+# Local env / secrets
+.env
+*.log
+
+# Data files 
+data/raw/
+data/**/*.csv
+data/**/*.json
+
+# SQL Server local artifacts
+*.mdf
+*.ldf
+*.bak

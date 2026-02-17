@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "adf-retail-pipeline-ithamar"
+        },
+        "LS_AzureBlob_Retail_connectionString": {
+            "value": ""
+        },
+        "LS_SQLServer_RetailDB_password": {
+            "value": ""
+        },
+        "LS_SQLServer_RetailDB_properties_typeProperties_server": {
+            "value": "localhost"
+        },
+        "LS_SQLServer_RetailDB_properties_typeProperties_database": {
+            "value": "RetailDB"
+        },
+        "LS_SQLServer_RetailDB_properties_typeProperties_userName": {
+            "value": "adf_user"
+        }
+    }
+}
