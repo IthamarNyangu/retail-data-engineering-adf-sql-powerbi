@@ -12,11 +12,6 @@ Thumbs.db
 .env
 *.log
 
-# Data files 
-data/raw/
-data/**/*.csv
-data/**/*.json
-
 # SQL Server local artifacts
 *.mdf
 *.ldf
